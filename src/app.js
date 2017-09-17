@@ -19,6 +19,7 @@ require('./color/setting');
 require('./core/constants');
 require('./utilities/conversion');
 require('./utilities/array_functions');
+require('./utilities/iteration');
 require('./utilities/string_functions');
 require('./core/environment');
 require('./image/image');
