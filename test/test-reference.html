@@ -55,6 +55,12 @@
     {regex: /sound/, condition: false && Modernizr.webaudio}
   ];
   var MS_TIMEOUT = 4000;
+  var fxns = [
+    'setup', 'draw', 'preload', 'mousePressed', 'mouseReleased',
+    'mouseMoved', 'mouseDragged', 'mouseClicked', 'mouseWheel',
+    'touchStarted', 'touchMoved', 'touchEnded',
+    'keyPressed', 'keyReleased', 'keyTyped'
+  ];
 
   // TODO: This code has basically been harvested from
   // https://github.com/processing/p5.js-website/blob/master/js/render.js.
@@ -78,12 +84,6 @@
           eval(runnable);
         }
 
-        var fxns = [
-          'setup', 'draw', 'preload', 'mousePressed', 'mouseReleased',
-          'mouseMoved', 'mouseDragged', 'mouseClicked', 'mouseWheel',
-          'touchStarted', 'touchMoved', 'touchEnded',
-          'keyPressed', 'keyReleased', 'keyTyped'
-        ];
         fxns.forEach(function(f) {
           var ind = runnable.indexOf(f+'(');
           // this is a gross hack within a hacky script that
@@ -154,16 +154,19 @@
 
             myp5 = new p5(createExampleSketch(exampleCode, function(p) {
               var drawCalled = false;
-              var oldSetup = p.setup || function() {};
-              var oldDraw = p.draw || function() {};
-
-              p.setup = function() {
-                try {
-                  oldSetup();
-                } catch(err) {
-                  reject(err);
+              fxns.forEach(function(f) {
+                var old = p[f];
+                if(old) {
+                  p[f] = function() {
+                    try {
+                      old.apply(this, arguments);
+                    } catch(err) {
+                      reject(err);
+                    }
+                  }
                 }
-              }
+              });
+              var oldDraw = p.draw || function() {};
 
               p.draw = function() {
                 try {
