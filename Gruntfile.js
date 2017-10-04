@@ -489,8 +489,8 @@ module.exports = function(grunt) {
     //'yuidoc:prod', // already done by lint-no-fix
     'build',
     'connect',
-    'mocha',
     'mochaChrome',
+    'mocha',
     'mochaTest'
   ]);
   grunt.registerTask('test:nobuild', ['eslint:test', 'connect', 'mocha']);
