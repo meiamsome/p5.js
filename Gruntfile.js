@@ -82,6 +82,33 @@ module.exports = function(grunt) {
     keepalive = true;
   }
 
+  var mochaConfig = {
+    yui: {
+      options: {
+        urls: [
+          'http://localhost:9001/test/test-reference.html'
+        ],
+        reporter: reporter,
+        run: false,
+        log: true,
+        logErrors: true
+      }
+    },
+    test: {
+      options: {
+        urls: [
+          'http://localhost:9001/test/test.html',
+          'http://localhost:9001/test/test-minified.html'
+        ],
+        reporter: reporter,
+        run: true,
+        log: true,
+        logErrors: true,
+        timeout: 100000
+      }
+    }
+  };
+
   grunt.initConfig({
 
     // read in the package, used for knowing the current version, et al.
@@ -185,32 +212,9 @@ module.exports = function(grunt) {
     },
 
     // Set up the mocha task, used for running the automated tests.
-    mocha: {
-      yui: {
-        options: {
-          urls: [
-            'http://localhost:9001/test/test-reference.html'
-          ],
-          reporter: reporter,
-          run: false,
-          log: true,
-          logErrors: true
-        }
-      },
-      test: {
-        options: {
-          urls: [
-            'http://localhost:9001/test/test.html',
-            'http://localhost:9001/test/test-minified.html'
-          ],
-          reporter: reporter,
-          run: true,
-          log: true,
-          logErrors: true,
-          timeout: 100000
-        }
-      }
-    },
+    mocha: mochaConfig,
+
+    mochaChrome: mochaConfig,
 
     // This is a standalone task, used to automatically update the bower.json
     // file to match the values in package.json. It is (likely) used as part
@@ -332,6 +336,9 @@ module.exports = function(grunt) {
   // Load release task
   grunt.loadTasks('tasks/release');
 
+  // Load tasks for testing
+  grunt.loadTasks('tasks/test');
+
   // Load the external libraries used.
   grunt.loadNpmTasks('grunt-contrib-compress');
   grunt.loadNpmTasks('grunt-contrib-connect');
@@ -353,7 +360,7 @@ module.exports = function(grunt) {
 
   // Create the multitasks.
   grunt.registerTask('build', ['browserify', 'uglify', 'requirejs']);
-  grunt.registerTask('test', ['jshint', 'jscs', 'yuidoc:prod', 'build', 'connect', 'mocha', 'mochaTest']);
+  grunt.registerTask('test', ['jshint', 'jscs', 'yuidoc:prod', 'build', 'connect', 'mocha', 'mochaChrome', 'mochaTest']);
   grunt.registerTask('test:nobuild', ['jshint:test', 'jscs:test', 'connect', 'mocha']);
   grunt.registerTask('yui', ['yuidoc:prod', 'minjson']);
   grunt.registerTask('yui:test', ['yuidoc:prod', 'connect', 'mocha:yui']);
