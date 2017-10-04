@@ -170,7 +170,8 @@ p5.RendererGL.prototype._resetContext = function(attr, options, callback) {
     this._pInst, true, attr));
   this._pInst._renderer.resize(w, h);
   this._pInst._renderer._applyDefaults();
-  this._pInst._elements.push(this._renderer);
+  // TODO: Should this be here?
+  this._pInst._elements.push(this);
   if(typeof callback === 'function') {
     //setTimeout with 0 forces the task to the back of the queue, this ensures that
     //we finish switching out the renderer
