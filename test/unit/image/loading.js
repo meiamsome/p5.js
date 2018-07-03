@@ -6,22 +6,28 @@ var testImageRender = function(file, sketch) {
   sketch.loadPixels();
   var p = sketch.pixels;
   var ctx = sketch;
-
   sketch.clear();
 
   return new Promise(function(resolve, reject) {
     sketch.loadImage(file, resolve, reject);
   }).then(function(img) {
     ctx.image(img, 0, 0);
-
     ctx.loadPixels();
-    var n = 0;
+    assert.equal(p.length, ctx.pixels.length);
+    var differences = [];
     for (var i = 0; i < p.length; i++) {
-      var diff = Math.abs(p[i] - ctx.pixels[i]);
-      n += diff;
+      if (p[i] !== ctx.pixels[i]) {
+        differences.push(i);
+      }
     }
-    var same = n === 0 && ctx.pixels.length === p.length;
-    return same;
+    if (differences.length) {
+      throw new Error(
+        'Pixels differ on the following keys: \n' +
+          differences
+            .map(id => id + ': expected ' + ctx.pixels[id] + ' actual ' + p[id])
+            .join('\n')
+      );
+    }
   });
 };
 
@@ -80,11 +86,7 @@ suite('loading images', function() {
       myp5.loadImage('unit/assets/target_small.gif', resolve, reject);
     }).then(function(img) {
       myp5.image(img, 0, 0);
-      return testImageRender('unit/assets/target_small.gif', myp5).then(
-        function(res) {
-          assert.isTrue(res);
-        }
-      );
+      return testImageRender('unit/assets/target_small.gif', myp5);
     });
   });
 
@@ -93,11 +95,7 @@ suite('loading images', function() {
       myp5.loadImage('unit/assets/target.gif', resolve, reject);
     }).then(function(img) {
       myp5.image(img, 0, 0, 6, 6, 5, 5, 6, 6);
-      return testImageRender('unit/assets/target_small.gif', myp5).then(
-        function(res) {
-          assert.isTrue(res);
-        }
-      );
+      return testImageRender('unit/assets/target_small.gif', myp5);
     });
   });
 
